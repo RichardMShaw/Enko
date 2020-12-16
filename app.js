@@ -13,5 +13,7 @@ client.on('ready', () => {
 });
 
 require('./db').sync()
-  .then(client.login(token);)
-  .catch (err => console.log(err))
+  .then(res => {
+    client.login(token)
+  })
+  .catch(err => console.log(err))

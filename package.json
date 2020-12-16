@@ -2,14 +2,7 @@
   "name": "enko",
   "version": "1.0.0",
   "description": "A discord bot",
-  "main": "discord.js",
-  "dependencies": {
-    "discord": "^0.8.2",
-    "express": "^4.17.1",
-    "mysql2": "^2.2.5",
-    "sequelize": "^6.3.5"
-  },
-  "devDependencies": {},
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -23,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/RichardMShaw/Enko/issues"
   },
-  "homepage": "https://github.com/RichardMShaw/Enko#readme"
+  "homepage": "https://github.com/RichardMShaw/Enko#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.3.5"
+  }
 }
