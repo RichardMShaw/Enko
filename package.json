@@ -1,0 +1,27 @@
+{
+  "name": "Enko",
+  "version": "1.0.0",
+  "description": "A discord bot",
+  "main": "discord.js",
+  "dependencies": {
+    "discord": "^0.8.2",
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.3.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RichardMShaw/Enko.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RichardMShaw/Enko/issues"
+  },
+  "homepage": "https://github.com/RichardMShaw/Enko#readme"
+}
