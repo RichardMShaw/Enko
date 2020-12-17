@@ -30,25 +30,8 @@ User.init({
 User.checkoutGuild = async (guild) => {
   let members = await guild.members.fetch()
   members.forEach(async (guildMember) => {
-    let { nickname, user } = guildMember
-    let { dataValues } = await User.checkoutGuildMember(guildMember)
-
-    let update = false
-
-    let tag = `${user.username}#${user.discriminator}`
-    if (dataValues.tag !== tag) {
-      dataValues.tag = tag
-      update = true
-    }
-
-    if (dataValues.displayName !== nickname) {
-      dataValues.displayName = (nickname) ? nickname : user.username
-      update = true
-    }
-
-    if (update) {
-      await User.update(dataValues, { where: { discordId: dataValues.discordId } })
-    }
+    let user = await User.checkoutGuildMember(guildMember)
+    await user.updateUser(guildMember)
   })
 }
 
