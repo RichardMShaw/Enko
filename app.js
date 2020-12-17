@@ -1,26 +1,35 @@
-const { token } = require('./keys')
+const { token, serverId } = require('./keys')
 const { User } = require('./models')
-const Discord = require('discord.js');
-const client = new Discord.Client();
+const client = require('./scripts/lib');
 
-client.on('message', msg => {
-  let { id, tag, username } = msg.author
-  User.findOrCreate({
-    where: { discordId: id },
-    defaults: {
-      discordId: id,
-      tag,
-      displayName: username,
-      points: 0
-    }
-  })
-    .then((user) => {
-      //console.log(user[0])
-      user[0].change_points(5)
-    })
+let ready = false
+
+const onModMessage = async (msg) => {
+
+}
+
+client.on('guildMemberUpdate', async (oldMem, newMem) => {
+  let user = await User.findOne({ where: { discordId: newMem.user.id } })
+  user.updateUser(newMem)
 });
 
-client.on('ready', () => {
+client.on('message', async msg => {
+  if (!ready || msg.author.bot) {
+    return;
+  }
+
+  let { author, channel, content } = msg
+  let { id, tag, username } = author
+
+  let user = await User.checkoutGuildMember(await client.guilds.fetch(user.id))
+
+  console.log(user)
+
+});
+
+client.on('ready', async () => {
+  await User.checkoutGuild(await client.guilds.fetch(serverId))
+  ready = true
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
