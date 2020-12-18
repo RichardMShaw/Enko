@@ -1,12 +1,12 @@
 const { token, serverId } = require('./keys')
 const { User } = require('./models')
-const client = require('./scripts/lib');
+
+const client = require('./scripts/global')
+let guild = {}
+
+const parseMsg = require('./scripts/parse-msg')
 
 let ready = false
-
-const onModMessage = async (msg) => {
-
-}
 
 client.on('guildMemberUpdate', async (oldMem, newMem) => {
   try {
@@ -20,20 +20,20 @@ client.on('message', async msg => {
     return;
   }
 
-  let { author, channel, content } = msg
-  let { id, tag, username } = author
-
   try {
-    let user = await User.checkoutGuildMember(await client.guilds.fetch(user.id))
-  } catch (err) { console.log(err) }
+    let user = await User.checkoutGuildMember(await guild.members.fetch(msg.author.id))
+    if (user.isMod) {
+      await parseMsg.onModMessage(msg)
+    }
 
-  console.log(user)
+  } catch (err) { console.log(err) }
 
 })
 
 client.on('ready', async () => {
   try {
-    await User.checkoutGuild(await client.guilds.fetch(serverId))
+    guild = await client.guilds.fetch(serverId)
+    await User.checkoutGuild(guild)
     ready = true
     console.log(`Logged in as ${client.user.tag}!`);
   } catch (err) { console.log(err) }

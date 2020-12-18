@@ -51,35 +51,38 @@ User.checkoutGuildMember = async (guildMember) => {
     .catch(err => console.log(err))
 }
 
-User.prototype.updateUser = async (guildMember) => {
+User.prototype.updateUser = async function (guildMember) {
   let self = this.dataValues
   let update = false
 
   let tag = `${guildMember.user.username}#${guildMember.user.discriminator}`
   if (self.tag !== tag) {
     self.tag = tag
+    update = true
   }
 
-  if (self.displayName !== guildMember.nickname) {
+  if (self.displayName !== guildMember.nickname && self.displayName !== guildMember.user.username) {
     self.displayName = (guildMember.nickname) ? guildMember.nickname : guildMember.user.username
+    update = true
   }
 
   try {
-    await User.update(self, { where: { discordId: self.discordId } })
+    if (update) {
+      await User.update(self, { where: { discordId: self.discordId } })
+    }
   } catch (err) { console.log(err) }
 
 }
 
-User.prototype.changePoints = function (val) {
+User.prototype.changePoints = async function (val) {
   let self = this.dataValues
-  console.log(dataValues)
   self.points += val
   try {
     await User.update(self, { where: { discordId: self.discordId } })
   } catch (err) { console.log(err) }
 }
 
-User.prototype.givePoints = (val, guildMember, channel) => {
+User.prototype.givePoints = async function (val, guildMember, channel) {
   try {
 
     let self = this.dataValues
