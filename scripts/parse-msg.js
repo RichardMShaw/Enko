@@ -186,6 +186,5 @@ module.exports = {
         await gift(author, content, channel)
         return
     }
-    console.log('Test')
   }
 }

@@ -29,7 +29,7 @@ User.init({
 
 User.checkoutGuild = async (guild) => {
   let members = await guild.members.fetch()
-  members.forEach(async (guildMember) => {
+  await members.forEach(async (guildMember) => {
     let user = await User.checkoutGuildMember(guildMember)
     await user.updateUser(guildMember)
   })

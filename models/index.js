@@ -1,4 +1,5 @@
 module.exports = {
   Template: require('./Template'),
-  User: require('./User')
+  User: require('./User'),
+  Role: require('./Role')
 }
