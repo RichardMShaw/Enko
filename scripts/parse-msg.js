@@ -1,6 +1,43 @@
 const client = require('./global/client');
-const { User } = require('../models')
+const { User, Role } = require('../models')
 const { serverId } = require('../keys')
+
+const role = async (author, content, channel) => {
+  if (content.length < 2) {
+    await channel.send(`If you're going to ask for a role you need to tell me which one.`)
+    return
+  }
+
+  let role = await Role.findOne({ where: { name: content[1] } })
+
+  if (!role) {
+    await channel.send(`Sorry, but the ${content[2]} role doesn't seem to exist`)
+    return
+  }
+
+  let guild = await client.guilds.fetch(serverId)
+  let guildMember = await guild.members.fetch(author.id)
+
+  let roles = Array.from(guildMember.roles.cache.keys())
+  let conflicts = await Role.findAll({ where: { conflicts: role.getDataValue('conflicts') } })
+
+  let rolesLen = roles.length
+  console.log(roles)
+  let conflictsLen = conflicts.length
+
+  for (let i = 0; i < rolesLen; i++) {
+    for (let j = 0; j < conflictsLen; j++) {
+      if (roles[i] === conflicts[j].getDataValue('discordId')) {
+        await guildMember.roles.remove(roles[i])
+        i = rolesLen
+        j = conflictsLen
+      }
+    }
+  }
+
+  await guildMember.roles.add(role.getDataValue('discordId'))
+  await channel.send(`There. You've been given the ${role.getDataValue('name')} role.`)
+}
 
 const points = async (author, content, channel) => {
   try {
@@ -184,6 +221,9 @@ module.exports = {
         return
       case 'e!gift':
         await gift(author, content, channel)
+        return
+      case 'e!role':
+        await role(author, content, channel)
         return
     }
   }
