@@ -12,11 +12,7 @@ Channel.init({
     type: DataTypes.STRING,
     allowNull: false
   },
-  botCommands: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false
-  },
-  botChat: {
+  botChannel: {
     type: DataTypes.BOOLEAN,
     allowNull: false
   },
@@ -31,7 +27,7 @@ Channel.checkoutGuild = async (guild) => {
     let channels = await guild.channels.cache
     await channels.forEach(async ({ id, name }) => {
       name = name.toLowerCase()
-      await Channel.findOrCreate({ where: { name: name }, defaults: { discordId: id, name: name, botCommands: false, botChat: false, blacklist: false } })
+      await Channel.findOrCreate({ where: { name: name }, defaults: { discordId: id, name: name, botChannel: false, blacklist: false } })
     })
   } catch (err) {
     console.log(err)

@@ -1,6 +1,96 @@
 const client = require('./global/client');
 const { User, Role } = require('../models')
 const { serverId } = require('../keys')
+const randInt = (max) => {
+  return Math.floor(Math.random() * Math.floor(max))
+}
+
+const findRepeats = (array, start, i) => {
+  if (array.length < i + 2 || array[i] !== array[i + 1]) {
+    return i - start
+  }
+  return findRepeats(array, start, i + 1)
+}
+
+const slots = async (author, content, channel) => {
+  let user = await User.findOne({ where: { discordId: author.id } })
+  let points = user.getDataValue('points')
+
+  if (points < 10) {
+    channel.send(`Sorry, but you need 10 points to play the slots and you're ${10 - points} short of that`)
+    return
+  }
+
+  results = []
+  for (let i = 0; i < 4; i++) {
+    results.push(randInt(8))
+  }
+
+  await channel.send(`${results[0]} | ${results[1]} | ${results[2]} | ${results[3]}`)
+
+  let seq = 0
+  let joker = true
+
+  for (let i = 0; i < 4; i++) {
+    let chain = findRepeats(results, i + seq, i + seq)
+
+    if (chain > 0) {
+      if (results[i] === 0 && joker) {
+        if (chain > 2) {
+          await user.changePoints(-50 - 10)
+          await channel.send(`Ouch. You rolled 4 jokers? Sorry, but I'm going to have to take away 50 points for that.`)
+        } else {
+          await user.changePoints(-10)
+          await channel.send(`Dang. The jokers came by and stole your winnings! Better luck next time.`)
+        }
+        return
+      }
+      joker = false
+    }
+
+    seq = (seq < chain) ? chain : seq
+    i += chain
+  }
+
+  switch (seq) {
+    case 3:
+      await user.changePoints(275 - 10)
+      await channel.send(
+        `Amazing! You hit 4 in a row and won ${275} points!`
+        + `\`\`\``
+        + `${user.getDataValue('displayName')}: ${user.getDataValue('points')}`
+        + `\`\`\``
+      )
+      break
+    case 2:
+      await user.changePoints(70 - 10)
+      await channel.send(
+        `Wow! 3 in a row nets you ${70} points!`
+        + `\`\`\``
+        + `${user.getDataValue('displayName')}: ${user.getDataValue('points')}`
+        + `\`\`\``
+      )
+      break
+    case 1:
+      await user.changePoints(15 - 10)
+      await channel.send(
+        `Neat! 2 in a row gets you ${15} points!`
+        + `\`\`\``
+        + `${user.getDataValue('displayName')}: ${user.getDataValue('points')}`
+        + `\`\`\``
+      )
+      break
+    case 0:
+      await user.changePoints(-10)
+      await channel.send(
+        `Sorry, but you didn't win anything.`
+        + `\`\`\``
+        + `${user.getDataValue('displayName')}: ${user.getDataValue('points')}`
+        + `\`\`\``
+      )
+  }
+  return
+}
 
 const role = async (author, content, channel) => {
   if (content.length < 2) {
@@ -224,6 +314,9 @@ module.exports = {
         return
       case 'e!role':
         await role(author, content, channel)
+        return
+      case 'e!slots':
+        await slots(author, content, channel)
         return
     }
   }

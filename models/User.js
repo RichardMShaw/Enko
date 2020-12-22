@@ -75,39 +75,11 @@ User.prototype.updateUser = async function (guildMember) {
 }
 
 User.prototype.changePoints = async function (val) {
-  let self = this.dataValues
-  self.points += val
+  let self = await User.findOne({ where: { discordId: this.dataValues.discordId } })
+  this.dataValues = self.dataValues
+  this.dataValues.points += val
   try {
-    await User.update(self, { where: { discordId: self.discordId } })
-  } catch (err) { console.log(err) }
-}
-
-User.prototype.givePoints = async function (val, guildMember, channel) {
-  try {
-
-    let self = this.dataValues
-    let user = await User.checkoutGuildMember(guildMember)
-    user = user.dataValues
-
-    if (val < 0) {
-      val *= -1
-    }
-
-    if (self.points - val < 0) {
-      await channel.send(`Not Enough Points!`)
-      return;
-    }
-
-    self.points -= val
-    user.points += val
-
-    await User.update(self, { where: { discordId: self.discordId } })
-    await User.update(user, { where: { discordId: user.discordId } })
-    let s = (val > 1) ? 's' : ''
-    await channel.send(
-      `${this.displayName} gave ${val} point${s} to ${user.displayName}.\n`
-      + `${this.displayName}: ${this.points}\n`
-      + `${user.displayName}: ${user.points}`)
+    await User.update(this.dataValues, { where: { discordId: this.dataValues.discordId } })
   } catch (err) { console.log(err) }
 }
 
